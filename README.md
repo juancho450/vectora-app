@@ -44,7 +44,7 @@ npm install
 npm run start
 
 # En otra terminal, inicia el servidor JSON para la API
-npm run server
+npm run api
 ```
 
 4. Abre tu navegador en http://localhost:4200/
@@ -55,7 +55,7 @@ npm run server
 |---------|-------------|
 | `npm run start` | Inicia el servidor de desarrollo de Angular |
 | `npm run build` | Genera la versión de producción en la carpeta `dist/` |
-| `npm run server` | Inicia el servidor JSON que actúa como backend |
+| `npm run api` | Inicia el servidor JSON que actúa como backend |
 | `npm run test` | Ejecuta los tests unitarios |
 | `npm run lint` | Ejecuta el linter para verificar la calidad del código |
 
