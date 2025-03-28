@@ -1,59 +1,90 @@
-# VectoraApp
+# VectoraApp - Sistema de Gestión Financiera
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.4.
+VectoraApp es una aplicación web desarrollada con Angular 19 que permite gestionar cuentas bancarias, transacciones y transferencias de forma eficiente y segura.
 
-## Development server
+## Características principales
 
-To start a local development server, run:
+- **Gestión de cuentas**: Crear, editar y visualizar cuentas bancarias
+- **Historial de transacciones**: Seguimiento detallado de movimientos con filtrado
+- **Transferencias**: Realizar transferencias entre cuentas
+- **Panel de control**: Visualización de resumen financiero
+- **Autenticación**: Sistema seguro de login/logout
 
+## Usuarios de prueba
+
+Para acceder a la aplicación, puedes utilizar cualquiera de estos usuarios:
+
+| Email | Contraseña |
+|-------|------------|
+| juan@example.com | password |
+| maria@example.com | password |
+
+## Requisitos previos
+
+- Node.js (versión 18 o superior)
+- npm (versión 9 o superior)
+- Angular CLI (versión 19.2.4)
+
+## Instalación
+
+1. Clona el repositorio:
 ```bash
-ng serve
+git clone https://github.com/yourusername/VectoraApp.git
+cd VectoraApp
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+2. Instala las dependencias:
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+3. Inicia el servidor de desarrollo y la API:
 ```bash
-ng generate --help
+# En una terminal, inicia el servidor de desarrollo
+npm run start
+
+# En otra terminal, inicia el servidor JSON para la API
+npm run server
 ```
 
-## Building
+4. Abre tu navegador en http://localhost:4200/
 
-To build the project run:
+## Scripts disponibles
 
-```bash
-ng build
+| Comando | Descripción |
+|---------|-------------|
+| `npm run start` | Inicia el servidor de desarrollo de Angular |
+| `npm run build` | Genera la versión de producción en la carpeta `dist/` |
+| `npm run server` | Inicia el servidor JSON que actúa como backend |
+| `npm run test` | Ejecuta los tests unitarios |
+| `npm run lint` | Ejecuta el linter para verificar la calidad del código |
+
+## Estructura del proyecto
+
+```
+VectoraApp/
+├── src/
+│   ├── app/
+│   │   ├── core/            # Servicios, interceptores y guards
+│   │   ├── feature/         # Componentes por funcionalidad
+│   │   ├── shared/          # Componentes, interfaces y stores compartidos
+│   │   └── ...
+│   ├── assets/              # Recursos estáticos
+│   └── ...
+├── db.json                  # Base de datos para JSON Server
+└── ...
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Características técnicas
 
-## Running unit tests
+- **Arquitectura**: Componentes standalone con patrón Signal Store
+- **Autenticación**: Interceptores HTTP para manejo de tokens
+- **UI**: Diseño responsive con Tailwind CSS
+- **Reactiva**: Uso de Signals para estado reactivo
+- **Formularios**: Implementación de formularios reactivos
+- **Routing**: Navegación optimizada con guards de autenticación
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
-```bash
-ng test
-```
+## Licencia
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Este proyecto está licenciado bajo la Licencia MIT.
