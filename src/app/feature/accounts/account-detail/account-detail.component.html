@@ -1,5 +1,5 @@
 <div class="p-6">
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Detalle de la Cuenta</h1>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Detalle de la cuenta</h1>
   
  @if (error()) {
     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
@@ -31,17 +31,17 @@
       <div class="flex justify-end space-x-3">
         <button 
           type="button" 
-          [routerLink]="['/dashboard/accounts/edit', account()!.id]" 
+          [routerLink]="['/accounts/edit', account()!.id]" 
           class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
-          Editar Cuenta
+          Editar cuenta
         </button>
         <button 
           type="button" 
           (click)="deleteAccount(account()!.id)" 
           class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
         >
-          Eliminar Cuenta
+          Eliminar cuenta
         </button>
       </div>
     </div>
@@ -123,7 +123,7 @@
     <div class="text-center py-8">
       <p class="text-gray-500">Cuenta no encontrada.</p>
       <button 
-        routerLink="/dashboard/accounts" 
+        routerLink="/accounts" 
         class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
       >
         Volver a la lista de cuentas

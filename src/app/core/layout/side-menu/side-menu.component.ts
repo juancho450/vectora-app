@@ -10,8 +10,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class SideMenuComponent {
   menuItems = [
-    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
-    { label: 'Cuentas', route: '/dashboard/accounts', icon: 'credit-card' },
-    // Agrega otros elementos de menú según necesites
+    { label: 'Dashboard', route: '/dashboard' },
+    { label: 'Cuentas', route: '/accounts' },
+    { label: 'Transferencias', route: '/transfers/new' },
+    { label: 'Transacciones', route: '/transactions' },
   ];
 } 

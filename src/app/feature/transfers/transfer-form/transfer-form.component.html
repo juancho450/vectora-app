@@ -1,0 +1,163 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Realizar Transferencia</h1>
+
+  <!-- Formulario de transferencia -->
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    @if (!showConfirmation) {
+      <form [formGroup]="transferForm" (ngSubmit)="confirmTransfer()">
+        <!-- Cuenta de origen -->
+        <div class="mb-4">
+          <label for="sourceAccountId" class="block text-sm font-medium text-gray-700 mb-1">Cuenta de Origen</label>
+          <select 
+            id="sourceAccountId" 
+            formControlName="sourceAccountId" 
+            class="w-full p-2 border rounded-md"
+          >
+            <option value="">Selecciona una cuenta</option>
+            @for (account of accounts(); track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} - {{ account.balance | currency }} - {{ account.accountNumber }}
+              </option>
+            }
+          </select>
+          @if (transferForm.get('sourceAccountId')?.invalid && transferForm.get('sourceAccountId')?.touched) {
+            <p class="mt-1 text-sm text-red-600">Debes seleccionar una cuenta de origen</p>
+          }
+        </div>
+
+        <!-- Cuenta de destino -->
+        <div class="mb-4">
+          <label for="destinationAccountId" class="block text-sm font-medium text-gray-700 mb-1">Cuenta de Destino</label>
+          <select 
+            id="destinationAccountId" 
+            formControlName="destinationAccountId" 
+            class="w-full p-2 border rounded-md"
+            [disabled]="!transferForm.get('sourceAccountId')?.value"
+          >
+            <option value="">Selecciona una cuenta</option>
+            @for (account of availableDestinationAccounts; track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} - {{ account.accountNumber }}
+              </option>
+            }
+          </select>
+          @if (transferForm.get('destinationAccountId')?.hasError('required') && transferForm.get('destinationAccountId')?.touched) {
+            <p class="mt-1 text-sm text-red-600">Debes seleccionar una cuenta de destino</p>
+          }
+          @if (transferForm.get('destinationAccountId')?.hasError('sameAccount')) {
+            <p class="mt-1 text-sm text-red-600">No puedes transferir a la misma cuenta</p>
+          }
+        </div>
+
+        <!-- Monto -->
+        <div class="mb-4">
+          <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Monto a Transferir</label>
+          <input 
+            type="number" 
+            id="amount" 
+            formControlName="amount" 
+            class="w-full p-2 border rounded-md" 
+            min="0.01" 
+            step="0.01"
+            [max]="sourceAccount?.balance || 0"
+          >
+          @if (transferForm.get('amount')?.hasError('required') && transferForm.get('amount')?.touched) {
+            <p class="mt-1 text-sm text-red-600">El monto es obligatorio</p>
+          }
+          @if (transferForm.get('amount')?.hasError('min') && transferForm.get('amount')?.touched) {
+            <p class="mt-1 text-sm text-red-600">El monto debe ser mayor a 0</p>
+          }
+          @if (transferForm.get('amount')?.hasError('max') && transferForm.get('amount')?.touched) {
+            <p class="mt-1 text-sm text-red-600">El monto no puede ser mayor al saldo disponible ({{ sourceAccount?.balance | currency }})</p>
+          }
+          @if (sourceAccount) {
+            <p class="mt-1 text-sm text-gray-500">Saldo disponible: {{ sourceAccount.balance | currency }}</p>
+          }
+        </div>
+
+        <!-- Descripción/Concepto -->
+        <div class="mb-6">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Concepto</label>
+          <input 
+            type="text" 
+            id="description" 
+            formControlName="description" 
+            class="w-full p-2 border rounded-md"
+            placeholder="Ej: Pago de alquiler"
+          >
+          @if (transferForm.get('description')?.invalid && transferForm.get('description')?.touched) {
+            <p class="mt-1 text-sm text-red-600">El concepto es obligatorio</p>
+          }
+        </div>
+
+        <!-- Mensaje de error general -->
+        @if (errorMessage) {
+          <div class="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Botones -->
+        <div class="flex justify-end space-x-4">
+          <button 
+            type="button" 
+            class="px-4 py-2 border rounded-md hover:bg-gray-100"
+            routerLink="/accounts"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            [disabled]="transferForm.invalid"
+          >
+            Continuar
+          </button>
+        </div>
+      </form>
+    } @else {
+      <!-- Pantalla de confirmación -->
+      <div class="text-center">
+        <h2 class="text-xl font-semibold mb-4">Confirmar Transferencia</h2>
+        
+        <div class="bg-gray-100 p-4 rounded-md mb-6">
+          <div class="flex justify-between mb-2">
+            <span class="font-medium">Cuenta Origen:</span>
+            <span>{{ getAccountById(transferForm.value.sourceAccountId)?.name || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between mb-2">
+            <span class="font-medium">Cuenta Destino:</span>
+            <span>{{ getAccountById(transferForm.value.destinationAccountId)?.name || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between mb-2">
+            <span class="font-medium">Monto:</span>
+            <span class="font-bold">{{ transferForm.value.amount | currency }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Concepto:</span>
+            <span>{{ transferForm.value.description }}</span>
+          </div>
+        </div>
+        
+        <p class="mb-6 text-gray-700">¿Estás seguro de realizar esta transferencia?</p>
+        
+        <div class="flex justify-center space-x-4">
+          <button 
+            type="button" 
+            class="px-4 py-2 border rounded-md hover:bg-gray-100"
+            (click)="cancelTransfer()"
+          >
+            Volver
+          </button>
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            (click)="processTransfer()"
+          >
+            Confirmar Transferencia
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div> 

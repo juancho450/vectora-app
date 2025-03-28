@@ -16,21 +16,17 @@ export class DashboardComponent implements OnInit {
   private accountsStore = inject(AccountsStore);
   private transactionsStore = inject(TransactionsStore);
   
-  // Acceder a los signals
   accounts = this.accountsStore.accounts;
   totalBalance = this.accountsStore.totalBalance;
   transactions = this.transactionsStore.transactions;
-  
-  isLoading = this.accountsStore.isLoading;
+
   error = this.accountsStore.error;
   
   ngOnInit(): void {
-    // Cargar las cuentas y transacciones recientes
     this.accountsStore.loadAccounts();
-    this.transactionsStore.loadTransactions(undefined); // Todas las transacciones sin filtro
+    this.transactionsStore.loadTransactions(undefined);
   }
   
-  // Obtener las 5 transacciones más recientes
   get recentTransactions() {
     return this.transactions().slice(0, 5);
   }

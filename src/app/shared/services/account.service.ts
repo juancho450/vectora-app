@@ -8,11 +8,11 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class AccountsService {
-  private apiUrl = environment.apiUrl + '/accounts'; // Ajusta según tu API
+  private apiUrl = environment.apiUrl + '/accounts';
 
   constructor(private http: HttpClient) {}
 
-  getAccounts(): Observable<BankAccount[]> {
+  getAccounts(): Observable<BankAccount[]> {  
     return this.http.get<BankAccount[]>(this.apiUrl);
   }
 

@@ -13,13 +13,12 @@ export const routes: Routes = [
         loadComponent: () => import('./core/pages/auth/auth.component').then(m => m.AuthComponent)
     },
     {
-        // Rutas que estarán dentro del layout principal
-        path: 'dashboard',
+        path: '',
         component: MainLayoutComponent,
         canActivate: [authGuard],
         children: [
             {
-                path: '',
+                path: 'dashboard',
                 loadComponent: () => import('./feature/dashboard/dashboard.component').then(m => m.DashboardComponent)
             },
             {
@@ -43,7 +42,28 @@ export const routes: Routes = [
                     }
                 ]
             },
-            // Puedes agregar más rutas dentro del dashboard según sea necesario
+            {
+                path: 'transfers',
+                children: [
+                    {
+                        path: 'new',
+                        loadComponent: () => import('./feature/transfers/transfer-form/transfer-form.component').then(m => m.TransferFormComponent)
+                    }
+                ]
+            },
+            {
+                path: 'transactions',
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./feature/transactions/transaction-list/transaction-list.component').then(m => m.TransactionListComponent)
+                    },
+                    {
+                        path: ':id',
+                        loadComponent: () => import('./feature/transactions/transaction-detail/transaction-detail.component').then(m => m.TransactionDetailComponent)
+                    }
+                ]
+            }
         ]
     },
     {

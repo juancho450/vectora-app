@@ -14,7 +14,7 @@ export class AuthComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  constructor(){
+  constructor() {
     this.createLoginForm();
   }
 
@@ -26,18 +26,26 @@ export class AuthComponent {
     return this.loginForm.get('password');
   }
 
-  handleLogin(){
+  handleLogin() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.authService.login(email, password).subscribe((isAuthenticated) => {
-        if (isAuthenticated) {
-          this.router.navigate(['/dashboard']);
+      this.authService.login(email, password).subscribe({
+        next: (isAuthenticated) => {
+          if (isAuthenticated) {
+            this.router.navigate(['/dashboard']);
+            return
+          }
+          alert('Usuario o contraseña incorrectos');
+
+        },
+        error: (error) => {
+          alert(error);
         }
       });
     }
   }
 
-  private createLoginForm(){
+  private createLoginForm() {
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', Validators.required)

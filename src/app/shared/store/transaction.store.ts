@@ -6,13 +6,12 @@ import { catchError, map, of, pipe, switchMap, tap } from 'rxjs';
 import { Transaction } from '../interfaces/transaction.interface';
 import { TransactionsService } from '../services/transaction.service';
 
-// Define el adaptador de entidad para transacciones
+
 const transactionsAdapter = createEntityAdapter<Transaction>({
   selectId: (transaction) => transaction.id,
-  sortComparer: (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(), // Ordenar por fecha descendente
+  sortComparer: (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 });
 
-// Estado inicial
 const initialState = transactionsAdapter.getInitialState({
   loaded: false,
   loading: false,
@@ -21,15 +20,12 @@ const initialState = transactionsAdapter.getInitialState({
   currentAccountId: null as string | null,
 });
 
-// Tipo del estado
 type TransactionsState = typeof initialState;
 
-// Crear el store de signals para transacciones
 export const TransactionsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withComputed(({ entities, currentAccountId, selectedTransactionId, loading, error }) => {
-    // Selectores computados
     return {
       transactions: computed(() => Object.values(entities()).filter(Boolean) as Transaction[]),
       filteredTransactions: computed(() => {
@@ -48,11 +44,9 @@ export const TransactionsStore = signalStore(
     };
   }),
   withMethods((store) => {
-    // Injectar el servicio
     const transactionsService = inject(TransactionsService);
     
     return {
-      // Cargar todas las transacciones
       loadTransactions: rxMethod<string | undefined>(
         pipe(
           tap((accountId: string | undefined) => {
@@ -65,7 +59,6 @@ export const TransactionsStore = signalStore(
           switchMap((accountId) => 
             transactionsService.getTransactions(accountId).pipe(
               map(transactions => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -97,19 +90,16 @@ export const TransactionsStore = signalStore(
         )
       ),
       
-      // Seleccionar una transacción
       selectTransaction: (id: string) => {
         patchState(store, { selectedTransactionId: id });
       },
       
-      // Crear una nueva transacción
       createTransaction: rxMethod<Omit<Transaction, 'id'>>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(newTransaction => 
             transactionsService.createTransaction(newTransaction).pipe(
               map(transaction => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -140,14 +130,12 @@ export const TransactionsStore = signalStore(
         )
       ),
       
-      // Actualizar una transacción
       updateTransaction: rxMethod<Transaction>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(updatedTransaction => 
             transactionsService.updateTransaction(updatedTransaction).pipe(
               map(transaction => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -181,7 +169,6 @@ export const TransactionsStore = signalStore(
         )
       ),
       
-      // Filtrar por cuenta
       filterByAccount: (accountId: string | null) => {
         patchState(store, { currentAccountId: accountId });
       }

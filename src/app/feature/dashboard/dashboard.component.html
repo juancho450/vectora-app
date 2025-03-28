@@ -12,16 +12,6 @@
         <h2 class="text-lg font-semibold mb-2">Saldo Total</h2>
         <p class="text-3xl font-bold text-green-600">{{ totalBalance() | currency }}</p>
       </div>
-      
-      <!-- <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-2">Cuentas Activas</h2>
-        <p class="text-3xl font-bold text-blue-600">{{ accounts().length }}</p>
-      </div> -->
-      
-      <!-- <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-2">Transacciones Recientes</h2>
-        <p class="text-3xl font-bold text-purple-600">{{ transactions().length }}</p>
-      </div> -->
     </div>
     
     <!-- Cuentas -->
@@ -29,7 +19,7 @@
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Mis cuentas</h2>
         <a *ngIf="accounts().length > 0"
-          routerLink="/dashboard/accounts" 
+          routerLink="/accounts" 
           class="text-blue-600 hover:text-blue-800"
         >
           Ver todas
@@ -40,7 +30,7 @@
         <div class="bg-white rounded-lg shadow p-8 text-center">
           <p class="text-gray-500 mb-4">No tienes cuentas bancarias todavía.</p>
           <a 
-            routerLink="/dashboard/accounts/new" 
+            routerLink="/accounts/new" 
             class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
             Crear nueva cuenta
@@ -51,7 +41,7 @@
           @for (account of accounts().slice(0, 3); track account.id) {
             <div 
               class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-              [routerLink]="['/dashboard/accounts', account.id]"
+              [routerLink]="['/accounts', account.id]"
             >
               <div class="p-4 border-b">
                 <div class="flex justify-between items-center">

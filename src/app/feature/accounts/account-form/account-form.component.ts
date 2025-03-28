@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,36 +18,41 @@ export class AccountFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private accountsStore = inject(AccountsStore);
   
-  // Acceder a los signals
   account = this.accountsStore.selectedAccount;
-  isLoading = this.accountsStore.isLoading;
   error = this.accountsStore.error;
   
-  accountForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required]],
-    accountNumber: ['', [Validators.required]],
-    accountType: ['CHECKING', [Validators.required]],
-    balance: [0, [Validators.required, Validators.min(0)]],
-  });
-  
+  accountForm: FormGroup;
   isEditMode = false;
+  private accountId: string | null = null;
+  
+  constructor() {
+    effect(() => {
+      const selectedAccount = this.account();
+      
+      if (this.accountForm && selectedAccount && this.isEditMode) {
+        this.accountForm.patchValue({
+          name: selectedAccount.name,
+          accountNumber: selectedAccount.accountNumber,
+          accountType: selectedAccount.accountType,
+          balance: selectedAccount.balance
+        });
+      }
+    });
+  }
   
   ngOnInit(): void {
+    this.createAccountForm();
+    
+    if (this.accountsStore.accounts().length === 0) {
+      this.accountsStore.loadAccounts();
+    }
+    
     this.route.params.subscribe(params => {
-      const accountId = params['id'];
+      this.accountId = params['id'];
       
-      if (accountId !== 'new') {
+      if (this.accountId !== 'new' && this.accountId) {
         this.isEditMode = true;
-        this.accountsStore.selectAccount(accountId);
-        
-        if (this.account()) {
-          this.accountForm.patchValue({
-            name: this.account()!.name,
-            accountNumber: this.account()!.accountNumber,
-            accountType: this.account()!.accountType,
-            balance: this.account()!.balance
-          });
-        }
+        this.accountsStore.selectAccount(this.accountId);
       }
     });
   }
@@ -58,7 +63,6 @@ export class AccountFormComponent implements OnInit {
     const formValue = this.accountForm.value;
     
     if (this.isEditMode && this.account()) {
-      // Actualizar cuenta existente
       this.accountsStore.updateAccount({
         ...this.account()!,
         name: formValue.name,
@@ -68,7 +72,6 @@ export class AccountFormComponent implements OnInit {
         lastUpdated: new Date()
       });
     } else {
-      // Crear nueva cuenta
       this.accountsStore.createAccount({
         name: formValue.name,
         accountNumber: formValue.accountNumber,
@@ -78,7 +81,15 @@ export class AccountFormComponent implements OnInit {
       });
     }
     
-    // Navegar de vuelta a la lista de cuentas
-    this.router.navigate(['/dashboard/accounts']);
+    this.router.navigate(['/accounts']);
+  }
+
+  private createAccountForm(): void {
+    this.accountForm = this.fb.group({
+      name: ['', [Validators.required]],
+      accountNumber: ['', [Validators.required]],
+      accountType: ['CHECKING', [Validators.required]],
+      balance: [0, [Validators.required, Validators.min(0)]],
+    });
   }
 }

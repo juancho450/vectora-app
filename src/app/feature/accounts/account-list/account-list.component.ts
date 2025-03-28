@@ -14,14 +14,11 @@ import { AccountsStore } from '../../../shared/store/account.store';
 export class AccountListComponent implements OnInit {
   private accountsStore = inject(AccountsStore);
   
-  // Acceder a los signals
   accounts = this.accountsStore.accounts;
-  isLoading = this.accountsStore.isLoading;
   error = this.accountsStore.error;
   totalBalance = this.accountsStore.totalBalance;
   
   ngOnInit(): void {
-    // Cargar las cuentas al inicializar el componente
     this.accountsStore.loadAccounts();
   }
   

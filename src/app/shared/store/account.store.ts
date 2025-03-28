@@ -6,12 +6,10 @@ import { catchError, map, of, pipe, switchMap, tap } from 'rxjs';
 import { BankAccount } from '../interfaces/account.interface';
 import { AccountsService } from '../services/account.service';
 
-// Define el adaptador de entidad para cuentas bancarias
 const accountsAdapter = createEntityAdapter<BankAccount>({
   selectId: (account: BankAccount) => account.id,
 });
 
-// Estado inicial
 const initialState = accountsAdapter.getInitialState({
   loaded: false,
   loading: false,
@@ -19,15 +17,12 @@ const initialState = accountsAdapter.getInitialState({
   selectedAccountId: null as string | null,
 });
 
-// Tipo del estado
 type AccountsState = typeof initialState;
 
-// Crear el store de signals para cuentas
 export const AccountsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withComputed(({ entities, selectedAccountId, loading, error }) => {
-    // Selectores computados
     return {
       accounts: computed(() => Object.values(entities()).filter(Boolean) as BankAccount[]),
       totalBalance: computed(() => 
@@ -44,18 +39,15 @@ export const AccountsStore = signalStore(
     };
   }),
   withMethods((store) => {
-    // Injectar el servicio
     const accountsService = inject(AccountsService);
     
     return {
-      // Cargar todas las cuentas
       loadAccounts: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(() => 
             accountsService.getAccounts().pipe(
               map(accounts => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -85,20 +77,53 @@ export const AccountsStore = signalStore(
           )
         )
       ),
+
+         loadAccountById: rxMethod<string>(
+          pipe(
+            tap(() => patchState(store, { loading: true, error: null })),
+            switchMap((id: string) => 
+              accountsService.getAccountById(id).pipe(
+                map(accounts => {
+                  const state = {
+                    ids: store.ids(),
+                    entities: store.entities(),
+                    selectedAccountId: store.selectedAccountId(),
+                    loaded: store.loaded(),
+                    loading: store.loading(),
+                    error: store.error()
+                  } as AccountsState;
+                  
+                  const result = accountsAdapter.addOne(accounts, state);
+                  
+                  patchState(store, {
+                    entities: result.entities,
+                    ids: result.ids,
+                    loaded: true,
+                    loading: false,
+                  });
+                }),
+                catchError(error => {
+                  patchState(store, { 
+                    error: error.message || 'Error al cargar las cuentas', 
+                    loading: false 
+                  });
+                  return of(null);
+                })
+              )
+            )
+          )
+        ),
       
-      // Seleccionar una cuenta
       selectAccount: (id: string) => {
         patchState(store, { selectedAccountId: id });
       },
       
-      // Crear una nueva cuenta
       createAccount: rxMethod<Omit<BankAccount, 'id'>>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(newAccount => 
             accountsService.createAccount(newAccount).pipe(
               map(account => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -124,14 +149,12 @@ export const AccountsStore = signalStore(
         )
       ),
       
-      // Actualizar una cuenta
       updateAccount: rxMethod<BankAccount>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(updatedAccount => 
             accountsService.updateAccount(updatedAccount).pipe(
               map(account => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),
@@ -160,14 +183,12 @@ export const AccountsStore = signalStore(
         )
       ),
       
-      // Eliminar una cuenta
       deleteAccount: rxMethod<string>(
         pipe(
           tap(() => patchState(store, { loading: true, error: null })),
           switchMap(id => 
             accountsService.deleteAccount(id).pipe(
               map(() => {
-                // Obtener estado actual y aplicar el adaptador
                 const state = {
                   ids: store.ids(),
                   entities: store.entities(),

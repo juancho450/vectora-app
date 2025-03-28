@@ -1,12 +1,20 @@
 <div class="p-6">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">Mis Cuentas Bancarias</h1>
-    <button 
-      routerLink="/dashboard/accounts/new" 
-      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-    >
-      Nueva cuenta
-    </button>
+    <div class="flex space-x-3">
+      <button 
+        routerLink="/transfers/new" 
+        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+      >
+        Nueva transferencia
+      </button>
+      <button 
+        routerLink="/accounts/new" 
+        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+      >
+        Nueva cuenta
+      </button>
+    </div>
   </div>
   
   <div class="bg-white rounded-lg shadow p-4 mb-6">
@@ -27,7 +35,7 @@
       @for (account of accounts(); track account.id) {
         <div 
           class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-          [routerLink]="['/dashboard/accounts', account.id]"
+          [routerLink]="['/accounts', account.id]"
           (click)="selectAccount(account.id)"
         >
           <div class="p-4 border-b">
