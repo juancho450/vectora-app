@@ -1,0 +1,141 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Financiero</h1>
+  
+  @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <!-- Resumen financiero -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-2">Saldo Total</h2>
+        <p class="text-3xl font-bold text-green-600">{{ totalBalance() | currency }}</p>
+      </div>
+      
+      <!-- <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-2">Cuentas Activas</h2>
+        <p class="text-3xl font-bold text-blue-600">{{ accounts().length }}</p>
+      </div> -->
+      
+      <!-- <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-2">Transacciones Recientes</h2>
+        <p class="text-3xl font-bold text-purple-600">{{ transactions().length }}</p>
+      </div> -->
+    </div>
+    
+    <!-- Cuentas -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Mis cuentas</h2>
+        <a *ngIf="accounts().length > 0"
+          routerLink="/dashboard/accounts" 
+          class="text-blue-600 hover:text-blue-800"
+        >
+          Ver todas
+        </a>
+      </div>
+      
+      @if (accounts().length === 0) {
+        <div class="bg-white rounded-lg shadow p-8 text-center">
+          <p class="text-gray-500 mb-4">No tienes cuentas bancarias todavía.</p>
+          <a 
+            routerLink="/dashboard/accounts/new" 
+            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            Crear nueva cuenta
+          </a>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (account of accounts().slice(0, 3); track account.id) {
+            <div 
+              class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              [routerLink]="['/dashboard/accounts', account.id]"
+            >
+              <div class="p-4 border-b">
+                <div class="flex justify-between items-center">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ account.name }}</h3>
+                  <span class="text-xs bg-gray-200 rounded px-2 py-1">{{ account.accountType }}</span>
+                </div>
+                <p class="text-sm text-gray-500">{{ account.accountNumber }}</p>
+              </div>
+              <div class="p-4">
+                <p class="text-2xl font-bold" [ngClass]="{
+                  'text-green-600': account.balance > 0,
+                  'text-red-600': account.balance < 0,
+                  'text-gray-600': account.balance === 0
+                }">
+                  {{ account.balance | currency }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    
+    <!-- Transacciones recientes -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Transacciones Recientes</h2>
+      </div>
+      
+      @if (recentTransactions.length === 0) {
+        <div class="bg-white rounded-lg shadow p-8 text-center">
+          <p class="text-gray-500">No hay transacciones recientes.</p>
+        </div>
+      } @else {
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cuenta</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for (transaction of recentTransactions; track transaction.id) {
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ transaction.date | date:'short' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ (accounts() | accountById:transaction.accountId)?.name || 'N/A' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ transaction.description }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': transaction.type === 'DEPOSIT',
+                        'bg-red-100 text-red-800': transaction.type === 'WITHDRAWAL',
+                        'bg-blue-100 text-blue-800': transaction.type === 'TRANSFER'
+                      }"
+                    >
+                      {{ transaction.type === 'DEPOSIT' ? 'Depósito' : 
+                         transaction.type === 'WITHDRAWAL' ? 'Retiro' : 'Transferencia' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                    [ngClass]="{
+                      'text-green-600': transaction.type === 'DEPOSIT',
+                      'text-red-600': transaction.type === 'WITHDRAWAL',
+                      'text-blue-600': transaction.type === 'TRANSFER'
+                    }"
+                  >
+                    {{ transaction.type === 'DEPOSIT' ? '+' : '-' }} {{ transaction.amount | currency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

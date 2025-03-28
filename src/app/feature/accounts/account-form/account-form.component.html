@@ -1,0 +1,70 @@
+<div class="p-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">
+      {{ isEditMode ? 'Editar cuenta' : 'Crear nueva cuenta' }}
+    </h1>
+  </div>
+  
+  @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Cuenta</label>
+            <input type="text" formControlName="name" class="w-full p-2 border rounded-md">
+            @if (accountForm.get('name')?.invalid && accountForm.get('name')?.touched) {
+              <p class="mt-1 text-sm text-red-600">El nombre de la cuenta es obligatorio</p>
+            }
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Cuenta</label>
+            <input type="text" formControlName="accountNumber" class="w-full p-2 border rounded-md">
+            @if (accountForm.get('accountNumber')?.invalid && accountForm.get('accountNumber')?.touched) {
+              <p class="mt-1 text-sm text-red-600">El número de cuenta es obligatorio</p>
+            }
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cuenta</label>
+            <select formControlName="accountType" class="w-full p-2 border rounded-md">
+              <option value="CORRIENTE">Cuenta Corriente</option>
+              <option value="AHORROS">Cuenta de Ahorros</option>
+              <option value="CREDITO">Cuenta de Crédito</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Saldo Inicial</label>
+            <input type="number" formControlName="balance" class="w-full p-2 border rounded-md" min="0" step="0.01">
+            @if (accountForm.get('balance')?.invalid && accountForm.get('balance')?.touched) {
+              <p class="mt-1 text-sm text-red-600">El saldo debe ser un valor positivo</p>
+            }
+          </div>
+          
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button 
+            type="button" 
+            routerLink="/dashboard/accounts" 
+            class="px-4 py-2 border rounded-md hover:bg-gray-100"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="accountForm.invalid"
+            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+          >
+            {{ isEditMode ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

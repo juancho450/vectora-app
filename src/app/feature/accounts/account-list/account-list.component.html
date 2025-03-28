@@ -1,0 +1,56 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Mis Cuentas Bancarias</h1>
+    <button 
+      routerLink="/dashboard/accounts/new" 
+      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+    >
+      Nueva cuenta
+    </button>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-2">Saldo Total</h2>
+    <p class="text-3xl font-bold text-green-600">{{ totalBalance() | currency }}</p>
+  </div>
+  
+  @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (accounts().length === 0) {
+    <div class="text-center py-8">
+      <p class="text-gray-500">No tienes cuentas bancarias. ¡Crea una para comenzar!</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (account of accounts(); track account.id) {
+        <div 
+          class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+          [routerLink]="['/dashboard/accounts', account.id]"
+          (click)="selectAccount(account.id)"
+        >
+          <div class="p-4 border-b">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold text-gray-800">{{ account.name }}</h3>
+              <span class="text-xs bg-gray-200 rounded px-2 py-1">{{ account.accountType }}</span>
+            </div>
+            <p class="text-sm text-gray-500">{{ account.accountNumber }}</p>
+          </div>
+          <div class="p-4">
+            <p class="text-2xl font-bold" [ngClass]="{
+              'text-green-600': account.balance > 0,
+              'text-red-600': account.balance < 0,
+              'text-gray-600': account.balance === 0
+            }">
+              {{ account.balance | currency }}
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+              Última actualización: {{ account.lastUpdated | date:'medium' }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

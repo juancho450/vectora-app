@@ -1,0 +1,133 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Detalle de la Cuenta</h1>
+  
+ @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (account()) {
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-semibold mb-2">{{ account()!.name }}</h2>
+      <p class="text-gray-500 mb-4">{{ account()!.accountNumber }}</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <p class="text-sm text-gray-500">Tipo de Cuenta</p>
+          <p class="text-lg font-semibold">{{ account()!.accountType }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-500">Saldo</p>
+          <p class="text-lg font-semibold" [ngClass]="{
+            'text-green-600': account()!.balance > 0,
+            'text-red-600': account()!.balance < 0,
+            'text-gray-600': account()!.balance === 0
+          }">
+            {{ account()!.balance | currency }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-3">
+        <button 
+          type="button" 
+          [routerLink]="['/dashboard/accounts/edit', account()!.id]" 
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Editar Cuenta
+        </button>
+        <button 
+          type="button" 
+          (click)="deleteAccount(account()!.id)" 
+          class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+        >
+          Eliminar Cuenta
+        </button>
+      </div>
+    </div>
+    
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-4">Transacciones</h2>
+      
+      @if (transactions().length === 0) {
+        <div class="bg-white rounded-lg shadow p-8 text-center">
+          <p class="text-gray-500">No hay transacciones para esta cuenta.</p>
+        </div>
+      } @else {
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for (transaction of transactions(); track transaction.id) {
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ transaction.date | date:'short' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ transaction.description }}
+                    @if (transaction.category) {
+                      <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ transaction.category }}
+                      </span>
+                    }
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': transaction.type === 'DEPOSIT',
+                        'bg-red-100 text-red-800': transaction.type === 'WITHDRAWAL',
+                        'bg-blue-100 text-blue-800': transaction.type === 'TRANSFER'
+                      }"
+                    >
+                      {{ transaction.type === 'DEPOSIT' ? 'Depósito' : 
+                         transaction.type === 'WITHDRAWAL' ? 'Retiro' : 'Transferencia' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                    [ngClass]="{
+                      'text-green-600': transaction.type === 'DEPOSIT',
+                      'text-red-600': transaction.type === 'WITHDRAWAL',
+                      'text-blue-600': transaction.type === 'TRANSFER'
+                    }"
+                  >
+                    {{ transaction.type === 'DEPOSIT' ? '+' : '-' }} {{ transaction.amount | currency }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': transaction.status === 'COMPLETED',
+                        'bg-yellow-100 text-yellow-800': transaction.status === 'PENDING',
+                        'bg-red-100 text-red-800': transaction.status === 'FAILED'
+                      }"
+                    >
+                      {{ transaction.status === 'COMPLETED' ? 'Completada' :
+                         transaction.status === 'PENDING' ? 'Pendiente' : 'Fallida' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="text-center py-8">
+      <p class="text-gray-500">Cuenta no encontrada.</p>
+      <button 
+        routerLink="/dashboard/accounts" 
+        class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Volver a la lista de cuentas
+      </button>
+    </div>
+  }
+</div>
